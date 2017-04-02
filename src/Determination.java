@@ -54,5 +54,40 @@ public class Determination {
 		_points.clear();
 	}
 	
+	// Return point with same name
+	public Point GetPoint(String name){
+		name = name.toUpperCase();
+		for(Point point : _points){
+			if(point.GetName() == name){
+				return point;
+			}
+		}
+		return null;
+	}
 	
+	// Add key if here nothing with same name
+	public void AddKey (String Key) {
+        Key = Key.toUpperCase();
+        // 1 - Проверка на повтор
+        for(String key : _keys) {
+            if(Key == key) { return; }
+        }
+        // 2 - Добавление
+        _keys.add(Key);
+    }
+	
+	// Add link for point
+	public boolean AddLink (Point point) {
+        return true;
+    }
+	
+	// Add point (return false if we have same name in list of points)
+	public boolean AddPoint (String name, boolean end , boolean start) {
+        name = name.toUpperCase();
+        for (Point point : _points) {
+            if (point.GetName() == name) return false;
+        }
+        _points.add(new Point(name, end, start));
+        return true;
+    }
 }
