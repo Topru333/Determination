@@ -43,8 +43,8 @@ public class Determination {
 		frame.getContentPane().add(button, BorderLayout.SOUTH);
 	}
 
-	public static ArrayList<String> _keys = new ArrayList<String>(); // Список возможных переходов
-	public static ArrayList<Point> _points = new ArrayList<Point>(); // Список возможных начальных точек
+	public static ArrayList<String> _keys = new ArrayList<String>(); // List of valible links
+	public static ArrayList<Point> _points = new ArrayList<Point>(); // First List of points
 
 	
 	public static void ClearKeys(){
