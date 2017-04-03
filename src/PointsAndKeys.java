@@ -19,13 +19,21 @@ import javax.swing.UIManager;
 import java.awt.Window.Type;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JRadioButton;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JCheckBox;
 
 public class PointsAndKeys {
 
 	private JFrame frame;
 	private JTable table;
 	private JTextField text;
-
+	DefaultTableModel model;
+	JRadioButton rbk,rbp;
+	private JCheckBox StartCheck;
+	private JCheckBox EndCheck;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -49,6 +57,8 @@ public class PointsAndKeys {
 		initialize();
 	}
 
+	
+	
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -73,21 +83,58 @@ public class PointsAndKeys {
 		
 		JButton btnNewButton = new JButton("Add");
 		
-		DefaultTableModel model = (DefaultTableModel) table.getModel(); 
+		model = (DefaultTableModel) table.getModel(); 
 		model.addColumn("PointKeys");
 		table.setEnabled(false);
+		
+		
+		// Function of Add button ( will add point or key in our List p.s. list in Determination class and he is static)
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				model.addRow(new Object[]{text.getText().toUpperCase()});
+				if(rbp.isSelected()){
+					Determination.AddPoint(text.getText().toUpperCase(),getStartCheck().isSelected(),getEndCheck().isSelected());
+				}
+				else if(rbk.isSelected()){
+					Determination.AddKey(text.getText().toUpperCase());
+				}
+				
 				text.setText("");
 			}
 		});
+		
+		
 		
 		JButton btnNewButton_1 = new JButton("Delete");
 		
 		JButton btnNewButton_2 = new JButton("Clear");
 		
 		JButton btnNewButton_3 = new JButton("Save");
+		
+		JRadioButton RbPoints = new JRadioButton("Points");
+		JRadioButton RbKeys = new JRadioButton("Keys");
+		rbp = RbPoints;
+		rbk = RbKeys;
+		RbPoints.setSelected(true);
+		
+		RbPoints.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				RbKeys.setSelected(false);
+				JTableUpdate();
+			}
+		});
+		RbKeys.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				RbPoints.setSelected(false);
+				JTableUpdate();
+			}
+		});
+		
+		StartCheck = new JCheckBox("Start");
+		
+		EndCheck = new JCheckBox("End");
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -95,13 +142,19 @@ public class PointsAndKeys {
 					.addContainerGap()
 					.addComponent(table, GroupLayout.PREFERRED_SIZE, 153, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(btnNewButton_3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(btnNewButton_2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(text))
-					.addContainerGap(22, Short.MAX_VALUE))
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(btnNewButton_3, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
+						.addComponent(btnNewButton_2, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
+						.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
+						.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
+						.addComponent(text)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(RbPoints)
+							.addPreferredGap(ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+							.addComponent(RbKeys))
+						.addComponent(StartCheck)
+						.addComponent(EndCheck))
+					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -116,12 +169,50 @@ public class PointsAndKeys {
 							.addComponent(btnNewButton_1)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnNewButton_2)
-							.addPreferredGap(ComponentPlacement.RELATED, 109, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(StartCheck)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(EndCheck)
+							.addPreferredGap(ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+								.addComponent(RbPoints)
+								.addComponent(RbKeys))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnNewButton_3))
 						.addComponent(table, GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		frame.getContentPane().setLayout(groupLayout);
 
+	}
+	
+	// Update for JTable after switch of radiocheck buttons
+	private void JTableUpdate(){
+		model.setRowCount(0);
+		if(rbp.isSelected()){ // If Points selected
+			for(Point p:Determination.GetPoints()){
+				model.addRow(new Object[] {p.GetName()});
+			}
+			getStartCheck().setVisible(true);
+			getEndCheck().setVisible(true);
+		}
+		else if(rbk.isSelected()){ // If Keys selected
+			for(String s:Determination.GetKeys()){
+				model.addRow(new Object[] {s});
+			}
+			getStartCheck().setVisible(false);
+			getEndCheck().setVisible(false);
+		}
+		else { // If nothing selected
+			model.addRow(new Object[] { "Error!" });
+			model.addRow(new Object[] { "Choice you'r mode please." });
+		}
+	}
+	
+	public JCheckBox getStartCheck() {
+		return StartCheck;
+	}
+	public JCheckBox getEndCheck() {
+		return EndCheck;
 	}
 }

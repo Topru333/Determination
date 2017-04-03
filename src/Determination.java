@@ -43,9 +43,15 @@ public class Determination {
 		frame.getContentPane().add(button, BorderLayout.SOUTH);
 	}
 
-	public static ArrayList<String> _keys = new ArrayList<String>(); // List of valible links
-	public static ArrayList<Point> _points = new ArrayList<Point>(); // First List of points
-
+	private static ArrayList<String> _keys = new ArrayList<String>(); // List of valible links
+	private static ArrayList<Point> _points = new ArrayList<Point>(); // First List of points
+	
+	public static ArrayList<String> GetKeys(){
+		return _keys;
+	}
+	public static ArrayList<Point> GetPoints(){
+		return _points;
+	}
 	
 	public static void ClearKeys(){
 		_keys.clear();
@@ -66,23 +72,24 @@ public class Determination {
 	}
 	
 	// Add key if here nothing with same name
-	public void AddKey (String Key) {
+	public static boolean AddKey (String Key) {
         Key = Key.toUpperCase();
         // 1 - Repeat check
         for(String key : _keys) {
-            if(Key == key) { return; }
+            if(Key == key) { return false; }
         }
         // 2 - Add
         _keys.add(Key);
+        return true;
     }
 	
 	// Add link for point
-	public boolean AddLink (Point point) {
+	public static boolean AddLink (Point point) {
         return true;
     }
 	
 	// Add point (return false if we have same name in list of points)
-	public boolean AddPoint (String name, boolean end , boolean start) {
+	public static boolean AddPoint (String name, boolean end , boolean start) {
         name = name.toUpperCase();
         for (Point point : _points) {
             if (point.GetName() == name) return false;
