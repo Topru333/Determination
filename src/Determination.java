@@ -68,11 +68,11 @@ public class Determination {
 	// Add key if here nothing with same name
 	public void AddKey (String Key) {
         Key = Key.toUpperCase();
-        // 1 - Проверка на повтор
+        // 1 - Repeat check
         for(String key : _keys) {
             if(Key == key) { return; }
         }
-        // 2 - Добавление
+        // 2 - Add
         _keys.add(Key);
     }
 	
@@ -90,4 +90,25 @@ public class Determination {
         _points.add(new Point(name, end, start));
         return true;
     }
+	
+	// Delete key from List of keys
+	public void DeleteKey(String Key){
+		Key = Key.toUpperCase();
+        try {
+            _keys.remove(Key);
+        }
+        catch (Exception e) { }
+	}
+	
+	// Delete point from list of the points
+	public void DeletePoint (String Name) {
+        Name = Name.toUpperCase();
+        for(Point p : _points) {
+            if(p.GetName() == Name) {
+                _points.remove(p);
+                return;
+            }
+        }
+    }
+	
 }
