@@ -1,12 +1,8 @@
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JTable;
-
 import javax.swing.table.DefaultTableModel;
-
 import java.awt.Color;
-
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -15,7 +11,6 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.Toolkit;
 import java.awt.Font;
 import javax.swing.UIManager;
-
 import java.awt.Window.Type;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -23,14 +18,15 @@ import javax.swing.JRadioButton;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 
 public class PointsAndKeys {
 
 	private JFrame frame;
 	private JTable table;
 	private JTextField text;
-	DefaultTableModel model;
-	JRadioButton rbk,rbp;
+	private DefaultTableModel model;
+	private JRadioButton rbk,rbp;
 	private JCheckBox StartCheck;
 	private JCheckBox EndCheck;
 	
@@ -64,7 +60,9 @@ public class PointsAndKeys {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setResizable(false);
 		frame.setType(Type.UTILITY);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.getContentPane().setBackground(new Color(240, 248, 255));
 		frame.setBackground(UIManager.getColor("FormattedTextField.inactiveForeground"));
 		frame.setForeground(Color.BLACK);
@@ -87,18 +85,29 @@ public class PointsAndKeys {
 		model.addColumn("PointKeys");
 		table.setEnabled(false);
 		
-		
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        if (JOptionPane.showConfirmDialog(frame, 
+		            "Do you want to save settings?", "Save settings?", 
+		            JOptionPane.YES_NO_OPTION,
+		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		        	Determination.ComboBoxUpdate();
+		        }
+		    }
+		});
 		// Function of Add button ( will add point or key in our List p.s. list in Determination class and he is static)
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				model.addRow(new Object[]{text.getText().toUpperCase()});
-				if(rbp.isSelected()){
-					Determination.AddPoint(text.getText().toUpperCase(),getStartCheck().isSelected(),getEndCheck().isSelected());
+				if(!(text.getText().equals("") || text.getText().equals(" "))){
+					model.addRow(new Object[]{text.getText().toUpperCase()});
+					if(rbp.isSelected()){
+						Determination.AddPoint(text.getText().toUpperCase(),getStartCheck().isSelected(),getEndCheck().isSelected());
+					}
+					else if(rbk.isSelected()){
+						Determination.AddKey(text.getText().toUpperCase());
+					}
 				}
-				else if(rbk.isSelected()){
-					Determination.AddKey(text.getText().toUpperCase());
-				}
-				
 				text.setText("");
 			}
 		});
@@ -106,10 +115,32 @@ public class PointsAndKeys {
 		
 		
 		JButton btnNewButton_1 = new JButton("Delete");
+		btnNewButton_1.addActionListener(new ActionListener() {
+		    
+			public void actionPerformed(ActionEvent arg0) {
+				
+				if(rbp.isSelected()){
+					Determination.DeletePoint(text.getText().toUpperCase());
+				}
+				else if(rbk.isSelected()){
+					Determination.DeleteKey(text.getText().toUpperCase());
+				}
+				JTableUpdate();
+			}
+		});
 		
 		JButton btnNewButton_2 = new JButton("Clear");
-		
-		JButton btnNewButton_3 = new JButton("Save");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(rbp.isSelected()){
+					Determination.ClearPoints();
+				}
+				else if(rbk.isSelected()){
+					Determination.ClearKeys();
+				}
+				JTableUpdate();
+			}
+		});
 		
 		JRadioButton RbPoints = new JRadioButton("Points");
 		JRadioButton RbKeys = new JRadioButton("Keys");
@@ -143,17 +174,16 @@ public class PointsAndKeys {
 					.addComponent(table, GroupLayout.PREFERRED_SIZE, 153, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnNewButton_3, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
 						.addComponent(btnNewButton_2, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
 						.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
 						.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
 						.addComponent(text)
+						.addComponent(StartCheck)
+						.addComponent(EndCheck)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(RbPoints)
 							.addPreferredGap(ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-							.addComponent(RbKeys))
-						.addComponent(StartCheck)
-						.addComponent(EndCheck))
+							.addComponent(RbKeys)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -173,12 +203,10 @@ public class PointsAndKeys {
 							.addComponent(StartCheck)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(EndCheck)
-							.addPreferredGap(ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
 							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 								.addComponent(RbPoints)
-								.addComponent(RbKeys))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnNewButton_3))
+								.addComponent(RbKeys)))
 						.addComponent(table, GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE))
 					.addContainerGap())
 		);
