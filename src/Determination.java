@@ -1,8 +1,7 @@
 import java.awt.EventQueue;
 
 import java.util.ArrayList;
-import java.util.Map;
-
+import org.apache.log4j.Logger;
 import javax.swing.JFrame;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -25,6 +24,8 @@ public class Determination {
     private static JComboBox<Point> PointBox2;
     private DefaultTableModel model;
 
+    final static Logger logger = Logger.getLogger(Determination.class);
+    
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -185,16 +186,20 @@ public class Determination {
 		ArrayList<Point> newPoints = new ArrayList<Point>();
 		Point started = GetStart(_points);
 		ArrayList<Point> ends = GetEnds(_points);
+		
 		ArrayList<Point> list;
+		
 		for(String s:_keys){
 			list = started.GetListOfPoints(s);
-			boolean end = false;
-			for(Point p : list){
-				if(p.IsEnd()){
-					end = true;
+			if(!list.isEmpty()){
+				boolean end = false;
+				for(Point p : list){
+					if(p.IsEnd()){
+						end = true;
+					}
 				}
+				newPoints.add(new Point(list,end));
 			}
-			newPoints.add(new Point(list,end));
 		}
 		for(Point p : ends){
 			
@@ -276,6 +281,7 @@ public class Determination {
             }
         }
     }
+	
 	public static void ComboBoxUpdate(){
 		PointBox1.removeAllItems();
 		PointBox2.removeAllItems();
