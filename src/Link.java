@@ -1,17 +1,18 @@
 
-public class Link{
-	private String _key;
+public class Link {
+	private String FirstPoint,Key,SecondPoint;
+	public String GetFirstPoint(){
+		return FirstPoint;
+	}
 	public String GetKey(){
-    	return _key;
-    }
-	
-    private Point _point;
-    public Point GetPoint(){
-    	return _point;
-    }
-    
-	 public Link (String key,Point point) {
-         _key = key;
-         _point = point;
-     }
+		return Key;
+	}
+	public String GetSecondPoint(){
+		return SecondPoint;
+	}
+	public Link(String first,String key,String second){
+		FirstPoint = first;
+		Key = key;
+		SecondPoint = second;
+	}
 }

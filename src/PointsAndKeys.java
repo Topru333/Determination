@@ -99,16 +99,27 @@ public class PointsAndKeys {
 		// Function of Add button ( will add point or key in our List p.s. list in Determination class and he is static)
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(!(text.getText().equals("") || text.getText().equals(" "))){
-					model.addRow(new Object[]{text.getText().toUpperCase()});
+				if(!(text.getText().equals("") || text.getText().equals(" "))&&!(getEndCheck().isSelected()&&getStartCheck().isSelected())){
 					if(rbp.isSelected()){
-						Determination.AddPoint(text.getText().toUpperCase(),getStartCheck().isSelected(),getEndCheck().isSelected());
+						if(getEndCheck().isSelected()){
+							Determination.AddPoint("*" + text.getText().toUpperCase());
+							model.addRow(new Object[]{"*"+text.getText().toUpperCase()});
+						}
+						else if(getStartCheck().isSelected()){
+							Determination.AddPoint("$" + text.getText().toUpperCase());
+							model.addRow(new Object[]{"$"+text.getText().toUpperCase()});
+						}
+						else{
+							Determination.AddPoint(text.getText().toUpperCase());
+							model.addRow(new Object[]{text.getText().toUpperCase()});
+						}
 					}
 					else if(rbk.isSelected()){
 						Determination.AddKey(text.getText().toUpperCase());
 					}
 				}
 				text.setText("");
+				JTableUpdate();
 			}
 		});
 		
@@ -218,8 +229,8 @@ public class PointsAndKeys {
 	private void JTableUpdate(){
 		model.setRowCount(0);
 		if(rbp.isSelected()){ // If Points selected
-			for(Point p:Determination.GetPoints()){
-				model.addRow(new Object[] {p.GetName()});
+			for(String p:Determination.GetPoints()){
+				model.addRow(new Object[] {p});
 			}
 			getStartCheck().setVisible(true);
 			getEndCheck().setVisible(true);

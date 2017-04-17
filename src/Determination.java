@@ -19,12 +19,18 @@ import javax.swing.table.DefaultTableModel;
 public class Determination {
 
 	private JFrame frame;
-	private static JComboBox<Point> PointBox1;
+	private static JComboBox<String> PointBox1;
 	private static JComboBox<String> KeyBox;
-    private static JComboBox<Point> PointBox2;
+    private static JComboBox<String> PointBox2;
     private DefaultTableModel model;
 
     final static Logger logger = Logger.getLogger(Determination.class);
+    
+    public static void Trace(String text){
+    	if(logger.isTraceEnabled()){
+    		logger.trace(text);
+    	}
+    }
     
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -62,22 +68,22 @@ public class Determination {
 		table.setBackground(new Color(169, 169, 169));
 		model = (DefaultTableModel) table.getModel();
 		
-		PointBox1 = new JComboBox<Point>();
+		PointBox1 = new JComboBox<String>();
 		
 		KeyBox = new JComboBox<String>();
 		
-		PointBox2 = new JComboBox<Point>();
+		PointBox2 = new JComboBox<String>();
 		
 		JButton AddButton = new JButton("Add");
 		AddButton.setFont(new Font("Tahoma", Font.BOLD, 11));
 		AddButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(!(PointBox1.getSelectedIndex() == -1)){
-				((Point)PointBox1.getSelectedItem()).AddLink(KeyBox.getSelectedItem().toString(), ((Point)PointBox2.getSelectedItem()));
-				
-				model.addRow(new Object[]{((Point)PointBox1.getSelectedItem()).GetName(),KeyBox.getSelectedItem().toString(),((Point)PointBox2.getSelectedItem()).GetName()});
-			
+				Link l = new Link((String)PointBox1.getSelectedItem(),(String)KeyBox.getSelectedItem(),(String)PointBox2.getSelectedItem());
+				if(!LinkExist(l)){
+					model.addRow(new Object[]{(String)PointBox1.getSelectedItem(),(String)KeyBox.getSelectedItem(),(String)PointBox2.getSelectedItem()});
+					_links.add(l);
 				}
+				
 			}
 		});
 		
@@ -85,12 +91,8 @@ public class Determination {
 		ClearButton.setFont(new Font("Tahoma", Font.BOLD, 11));
 		ClearButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				for (Point p : Determination._points){
-					p.ClearLinks();
-				}
-				
+				_links.clear();
 			}
-			
 		});
 		
 		SettingsButton = new JButton("Settings");
@@ -155,8 +157,9 @@ public class Determination {
 	}
 
 	private static ArrayList<String> _keys = new ArrayList<String>(); // List of valible links
-	private static ArrayList<Point> _points = new ArrayList<Point>(); // First List of points
-	private static ArrayList<Point> _detpoints = new ArrayList<Point>(); // Second List of points (after determinate)
+	private static ArrayList<String> _points = new ArrayList<String>(); // First List of points
+	private static ArrayList<String> _detpoints = new ArrayList<String>(); // Second List of points (after determinate)
+	private static ArrayList<Link> _links = new ArrayList<Link>();
 	private JTable table;
 	private JButton SettingsButton;
 	private JButton DetButton;
@@ -164,13 +167,15 @@ public class Determination {
 	public static ArrayList<String> GetKeys(){
 		return _keys;
 	}
-	public static ArrayList<Point> GetPoints(){
+	public static ArrayList<String> GetPoints(){
 		return _points;
 	}
-	public static ArrayList<Point> GetDetPoints(){
+	public static ArrayList<String> GetDetPoints(){
 		return _detpoints;
 	}
-	
+	public static ArrayList<Link> GetLinks(){
+		return _links;
+	}
 	public static void ClearKeys(){
 		_keys.clear();
 	}
@@ -183,52 +188,34 @@ public class Determination {
 	
 	
 	private void Determinate(){
-		ArrayList<Point> newPoints = new ArrayList<Point>();
-		Point started = GetStart(_points);
-		ArrayList<Point> ends = GetEnds(_points);
+		String startPoint = GetStart(_points);
+		int nRow = model.getRowCount();
 		
-		ArrayList<Point> list;
-		
-		for(String s:_keys){
-			list = started.GetListOfPoints(s);
-			if(!list.isEmpty()){
-				boolean end = false;
-				for(Point p : list){
-					if(p.IsEnd()){
-						end = true;
-					}
-				}
-				newPoints.add(new Point(list,end));
-			}
-		}
-		for(Point p : ends){
+		for(int i = 0; i < nRow; i++){
 			
 		}
-		
 	}
 	
-	private ArrayList<Point> GetEnds(ArrayList<Point> points){
-		ArrayList<Point> ends = new ArrayList<Point>();
-		for (Point p: points){
-			if(p.IsEnd()){
-				ends.add(p);
+	private boolean LinkExist(Link l){
+		for(Link link:_links){
+			if(link.GetFirstPoint().equals(l.GetFirstPoint())&&link.GetSecondPoint().equals(l.GetSecondPoint())&&link.GetKey().equals(l.GetKey())){
+				return true;
+			}
+		}
+		return false;
+	}
+	private ArrayList<String> GetEnds(ArrayList<String> points){
+		ArrayList<String> ends = new ArrayList<String>();
+		for(String point:points){
+			if(point.contains("*")){
+				ends.add(point);
 			}
 		}
 		return ends;
 	}
-	private Point GetStart(ArrayList<Point> points){
-		for (Point p: points){
-			if(p.IsEnd()){
-				return p;
-			}
-		}
-		return null;
-	}
-	// Return point with same name
-	public Point GetPoint(String name){
-		name = name.toUpperCase();
-		for(Point point : _points){
-			if(point.GetName() == name){
+	private String GetStart(ArrayList<String> points){
+		for(String point:points){
+			if(point.contains("$")){
 				return point;
 			}
 		}
@@ -247,19 +234,14 @@ public class Determination {
         return true;
     }
 	
-	// Add link for point
-	public static boolean AddLink (Point point) {
-        return true;
-    }
 	
 	// Add point (return false if we have same name in list of points)
-	public static boolean AddPoint (String name, boolean end , boolean start) {
-        name = name.toUpperCase();
-        for (Point point : _points) {
-            if (point.GetName() == name) return false;
+	public static boolean AddPoint (String name) {
+		for(String point : _points) {
+            if(point == name) { return false; }
         }
-        _points.add(new Point(name, end, start));
-        return true;
+		_points.add(name);
+		return true;
     }
 	
 	// Delete key from List of keys
@@ -273,20 +255,18 @@ public class Determination {
 	
 	// Delete point from list of the points
 	public static void DeletePoint (String Name) {
-        Name = Name.toUpperCase();
-        for(Point p : _points) {
-            if(p.GetName().equals(Name)) {
-                _points.remove(p);
-                return;
-            }
+		Name = Name.toUpperCase();
+        try {
+            _points.remove(Name);
         }
+        catch (Exception e) { }
     }
 	
 	public static void ComboBoxUpdate(){
 		PointBox1.removeAllItems();
 		PointBox2.removeAllItems();
 		KeyBox.removeAllItems();
-			for(Point p:Determination.GetPoints()){
+			for(String p:Determination.GetPoints()){
 				PointBox1.addItem(p);
 				PointBox2.addItem(p);
 			}
