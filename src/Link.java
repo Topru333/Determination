@@ -1,18 +1,25 @@
 
 public class Link {
-	private String FirstPoint,Key,SecondPoint;
-	public String GetFirstPoint(){
+	private Point FirstPoint,SecondPoint;
+	private String Key;
+	public Point GetFirstPoint(){
 		return FirstPoint;
 	}
 	public String GetKey(){
 		return Key;
 	}
-	public String GetSecondPoint(){
+	public Point GetSecondPoint(){
 		return SecondPoint;
 	}
-	public Link(String first,String key,String second){
+	public Link(Point first,String key,Point second){
 		FirstPoint = first;
 		Key = key;
 		SecondPoint = second;
+	}
+	public boolean equals(Link l){
+		if(l.GetFirstPoint().equals(FirstPoint) && l.GetKey().equals(Key) && l.GetSecondPoint().equals(SecondPoint)){
+			return true;
+		}
+		return false;
 	}
 }

@@ -27,7 +27,6 @@ public class PointsAndKeys {
 	private JTextField text;
 	private DefaultTableModel model;
 	private JRadioButton rbk,rbp;
-	private JCheckBox StartCheck;
 	private JCheckBox EndCheck;
 	
 	/**
@@ -99,18 +98,14 @@ public class PointsAndKeys {
 		// Function of Add button ( will add point or key in our List p.s. list in Determination class and he is static)
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(!(text.getText().equals("") || text.getText().equals(" "))&&!(getEndCheck().isSelected()&&getStartCheck().isSelected())){
+				if(!(text.getText().equals("") || text.getText().equals(" "))){
 					if(rbp.isSelected()){
 						if(getEndCheck().isSelected()){
-							Determination.AddPoint("*" + text.getText().toUpperCase());
-							model.addRow(new Object[]{"*"+text.getText().toUpperCase()});
-						}
-						else if(getStartCheck().isSelected()){
-							Determination.AddPoint("$" + text.getText().toUpperCase());
-							model.addRow(new Object[]{"$"+text.getText().toUpperCase()});
+							Determination.AddPoint(text.getText().toUpperCase(),true);
+							model.addRow(new Object[]{"*" + text.getText().toUpperCase()});
 						}
 						else{
-							Determination.AddPoint(text.getText().toUpperCase());
+							Determination.AddPoint(text.getText().toUpperCase(),false);
 							model.addRow(new Object[]{text.getText().toUpperCase()});
 						}
 					}
@@ -174,8 +169,6 @@ public class PointsAndKeys {
 			}
 		});
 		
-		StartCheck = new JCheckBox("Start");
-		
 		EndCheck = new JCheckBox("End");
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
@@ -185,16 +178,15 @@ public class PointsAndKeys {
 					.addComponent(table, GroupLayout.PREFERRED_SIZE, 153, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnNewButton_2, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
-						.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
-						.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
-						.addComponent(text)
-						.addComponent(StartCheck)
-						.addComponent(EndCheck)
+						.addComponent(btnNewButton_2, GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
+						.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
+						.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
+						.addComponent(text, 126, 126, 126)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(RbPoints)
-							.addPreferredGap(ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-							.addComponent(RbKeys)))
+							.addPreferredGap(ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+							.addComponent(RbKeys))
+						.addComponent(EndCheck))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -210,15 +202,13 @@ public class PointsAndKeys {
 							.addComponent(btnNewButton_1)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnNewButton_2)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(StartCheck)
-							.addPreferredGap(ComponentPlacement.RELATED)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(EndCheck)
-							.addPreferredGap(ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED, 88, Short.MAX_VALUE)
 							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 								.addComponent(RbPoints)
 								.addComponent(RbKeys)))
-						.addComponent(table, GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE))
+						.addComponent(table, GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		frame.getContentPane().setLayout(groupLayout);
@@ -229,17 +219,15 @@ public class PointsAndKeys {
 	private void JTableUpdate(){
 		model.setRowCount(0);
 		if(rbp.isSelected()){ // If Points selected
-			for(String p:Determination.GetPoints()){
-				model.addRow(new Object[] {p});
+			for(Point p:Determination.GetPoints()){
+				model.addRow(new Object[] {p.Name()});
 			}
-			getStartCheck().setVisible(true);
 			getEndCheck().setVisible(true);
 		}
 		else if(rbk.isSelected()){ // If Keys selected
 			for(String s:Determination.GetKeys()){
 				model.addRow(new Object[] {s});
 			}
-			getStartCheck().setVisible(false);
 			getEndCheck().setVisible(false);
 		}
 		else { // If nothing selected
@@ -248,9 +236,6 @@ public class PointsAndKeys {
 		}
 	}
 	
-	public JCheckBox getStartCheck() {
-		return StartCheck;
-	}
 	public JCheckBox getEndCheck() {
 		return EndCheck;
 	}
